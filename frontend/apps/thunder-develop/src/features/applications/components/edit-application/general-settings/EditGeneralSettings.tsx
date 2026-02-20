@@ -16,11 +16,16 @@
  * under the License.
  */
 
-import {Stack} from '@wso2/oxygen-ui';
+import {useState, useCallback} from 'react';
+import type {JSX} from 'react';
+import {Stack, Snackbar, Alert} from '@wso2/oxygen-ui';
 import type {Application} from '../../../models/application';
 import type {OAuth2Config} from '../../../models/oauth';
 import QuickCopySection from './QuickCopySection';
 import AccessSection from './AccessSection';
+import DangerZoneSection from './DangerZoneSection';
+import ApplicationRevokeDialog from '../../ApplicationRevokeDialog';
+import ClientSecretSuccessDialog from '../../ClientSecretSuccessDialog';
 
 /**
  * Props for the {@link EditGeneralSettings} component.
@@ -62,6 +67,7 @@ interface EditGeneralSettingsProps {
  * Displays sections for:
  * - Quick copy of application credentials (ID, Client ID)
  * - Access configuration (URL, redirect URIs, allowed user types)
+ * - Danger zone (revoke application / regenerate client secret)
  *
  * @param props - Component props
  * @returns General settings sections wrapped in a Stack
@@ -73,21 +79,82 @@ export default function EditGeneralSettings({
   oauth2Config = undefined,
   copiedField,
   onCopyToClipboard,
-}: EditGeneralSettingsProps) {
+}: EditGeneralSettingsProps): JSX.Element {
+  const [revokeDialogOpen, setRevokeDialogOpen] = useState(false);
+  const [secretDialogOpen, setSecretDialogOpen] = useState(false);
+  const [newClientSecret, setNewClientSecret] = useState<string>('');
+  const [errorSnackbar, setErrorSnackbar] = useState<{open: boolean; message: string}>({
+    open: false,
+    message: '',
+  });
+
+  const handleRevokeClick = useCallback((): void => {
+    setRevokeDialogOpen(true);
+  }, []);
+
+  const handleRevokeSuccess = useCallback((clientSecret: string): void => {
+    setNewClientSecret(clientSecret);
+    setSecretDialogOpen(true);
+  }, []);
+
+  const handleRevokeError = useCallback((message: string): void => {
+    setErrorSnackbar({open: true, message});
+  }, []);
+
+  const handleSecretDialogClose = useCallback((): void => {
+    setSecretDialogOpen(false);
+    setNewClientSecret('');
+  }, []);
+
+  const handleSnackbarClose = useCallback((): void => {
+    setErrorSnackbar((prev) => ({...prev, open: false}));
+  }, []);
+
   return (
-    <Stack spacing={3}>
-      <QuickCopySection
-        application={application}
-        oauth2Config={oauth2Config}
-        copiedField={copiedField}
-        onCopyToClipboard={onCopyToClipboard}
+    <>
+      <Stack spacing={3}>
+        <QuickCopySection
+          application={application}
+          oauth2Config={oauth2Config}
+          copiedField={copiedField}
+          onCopyToClipboard={onCopyToClipboard}
+        />
+        <AccessSection
+          application={application}
+          editedApp={editedApp}
+          oauth2Config={oauth2Config}
+          onFieldChange={onFieldChange}
+        />
+        <DangerZoneSection onRevokeClick={handleRevokeClick} />
+      </Stack>
+
+      {/* Revoke Application Confirmation Dialog */}
+      <ApplicationRevokeDialog
+        open={revokeDialogOpen}
+        applicationId={application.id}
+        onClose={() => setRevokeDialogOpen(false)}
+        onSuccess={handleRevokeSuccess}
+        onError={handleRevokeError}
       />
-      <AccessSection
-        application={application}
-        editedApp={editedApp}
-        oauth2Config={oauth2Config}
-        onFieldChange={onFieldChange}
+
+      {/* New Client Secret Success Dialog */}
+      <ClientSecretSuccessDialog
+        open={secretDialogOpen}
+        clientSecret={newClientSecret}
+        onClose={handleSecretDialogClose}
       />
-    </Stack>
+
+      {/* Error Snackbar */}
+      <Snackbar
+        open={errorSnackbar.open}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{vertical: 'bottom', horizontal: 'right'}}
+      >
+        <Alert severity="error" onClose={handleSnackbarClose}>
+          {errorSnackbar.message}
+        </Alert>
+      </Snackbar>
+    </>
   );
 }
