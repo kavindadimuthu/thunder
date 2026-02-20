@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2025, WSO2 LLC. (https://www.wso2.com).
+ * Copyright (c) 2025-2026, WSO2 LLC. (https://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -23,13 +23,29 @@ import ApplicationRevokeDialog from '../ApplicationRevokeDialog';
 import type {ApplicationRevokeDialogProps} from '../ApplicationRevokeDialog';
 
 // Mock the logger
-vi.mock('@thunder/logger', () => ({
-  useLogger: () => ({
-    info: vi.fn(),
-    error: vi.fn(),
-    warn: vi.fn(),
-    debug: vi.fn(),
-  }),
+vi.mock('@thunder/logger', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@thunder/logger')>();
+  return {
+    ...actual,
+    useLogger: () => ({
+      info: vi.fn(),
+      error: vi.fn(),
+      warn: vi.fn(),
+      debug: vi.fn(),
+    }),
+  };
+});
+
+// Create a mock mutate function
+const mockMutate = vi.fn();
+const mockRevokeApplication = {
+  mutate: mockMutate,
+  isPending: false,
+};
+
+// Mock useRevokeApplication hook
+vi.mock('../../api/useRevokeApplication', () => ({
+  default: () => mockRevokeApplication,
 }));
 
 // Mock translations
@@ -70,12 +86,11 @@ describe('ApplicationRevokeDialog', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.useFakeTimers({shouldAdvanceTime: true});
+    mockRevokeApplication.isPending = false;
   });
 
   afterEach(() => {
     vi.clearAllMocks();
-    vi.useRealTimers();
   });
 
   describe('Rendering', () => {
@@ -115,7 +130,7 @@ describe('ApplicationRevokeDialog', () => {
 
   describe('User Interactions', () => {
     it('should call onClose when Cancel button is clicked', async () => {
-      const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+      const user = userEvent.setup();
       renderDialog();
 
       const cancelButton = screen.getByRole('button', {name: 'Cancel'});
@@ -125,7 +140,7 @@ describe('ApplicationRevokeDialog', () => {
     });
 
     it('should call onClose when Escape key is pressed', async () => {
-      const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+      const user = userEvent.setup();
       renderDialog();
 
       await user.keyboard('{Escape}');
@@ -133,77 +148,65 @@ describe('ApplicationRevokeDialog', () => {
       expect(mockOnClose).toHaveBeenCalledTimes(1);
     });
 
-    it('should show loading state when Revoke button is clicked', async () => {
-      const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+    it('should call mutate when Revoke button is clicked', async () => {
+      const user = userEvent.setup();
       renderDialog();
 
       const revokeButton = screen.getByRole('button', {name: 'Revoke'});
       await user.click(revokeButton);
 
-      expect(screen.getByRole('button', {name: 'Revoking...'})).toBeInTheDocument();
-    });
-
-    it('should disable buttons during revocation', async () => {
-      const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-      renderDialog();
-
-      const revokeButton = screen.getByRole('button', {name: 'Revoke'});
-      await user.click(revokeButton);
-
-      const cancelButton = screen.getByRole('button', {name: 'Cancel'});
-      expect(cancelButton).toBeDisabled();
-      expect(screen.getByRole('button', {name: 'Revoking...'})).toBeDisabled();
+      expect(mockMutate).toHaveBeenCalledWith(
+        {applicationId: 'test-app-id'},
+        expect.objectContaining({
+          onSuccess: expect.any(Function),
+          onError: expect.any(Function),
+        }),
+      );
     });
 
     it('should not initiate revocation when applicationId is null', async () => {
-      const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+      const user = userEvent.setup();
       renderDialog({...defaultProps, applicationId: null});
 
       const revokeButton = screen.getByRole('button', {name: 'Revoke'});
       await user.click(revokeButton);
 
-      // Button should not show loading state
-      expect(screen.getByRole('button', {name: 'Revoke'})).toBeInTheDocument();
+      expect(mockMutate).not.toHaveBeenCalled();
     });
   });
 
   describe('Success Flow', () => {
     it('should call onSuccess with new client secret after successful revocation', async () => {
-      // Force Math.random to return > 0.1 to ensure success
-      vi.spyOn(Math, 'random').mockReturnValue(0.5);
+      // Mock mutate to immediately call onSuccess
+      mockMutate.mockImplementation((_vars, options) => {
+        options?.onSuccess?.({clientSecret: 'new-test-secret-123'});
+      });
 
-      const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+      const user = userEvent.setup();
       renderDialog();
 
       const revokeButton = screen.getByRole('button', {name: 'Revoke'});
       await user.click(revokeButton);
 
-      // Advance timers to complete the mock API call
-      await vi.advanceTimersByTimeAsync(1500);
-
       await waitFor(() => {
         expect(mockOnClose).toHaveBeenCalled();
-        expect(mockOnSuccess).toHaveBeenCalled();
+        expect(mockOnSuccess).toHaveBeenCalledWith('new-test-secret-123');
       });
-
-      // Verify that onSuccess was called with a string (the new client secret)
-      expect(mockOnSuccess).toHaveBeenCalledWith(expect.any(String));
     });
   });
 
   describe('Error Handling', () => {
     it('should display error message when revocation fails', async () => {
-      // Force Math.random to return <= 0.1 to trigger error
-      vi.spyOn(Math, 'random').mockReturnValue(0.05);
+      // Mock mutate to immediately call onError
+      mockMutate.mockImplementation((_vars, options) => {
+        options?.onError?.(new Error('Failed to revoke application. Please try again.'));
+      });
 
-      const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+      const user = userEvent.setup();
       renderDialog();
 
       const revokeButton = screen.getByRole('button', {name: 'Revoke'});
       await user.click(revokeButton);
-
-      // Advance timers to complete the mock API call
-      await vi.advanceTimersByTimeAsync(1500);
 
       await waitFor(() => {
         expect(screen.getByText('Failed to revoke application. Please try again.')).toBeInTheDocument();
@@ -211,17 +214,16 @@ describe('ApplicationRevokeDialog', () => {
     });
 
     it('should call onError callback when revocation fails', async () => {
-      // Force Math.random to return <= 0.1 to trigger error
-      vi.spyOn(Math, 'random').mockReturnValue(0.05);
+      // Mock mutate to immediately call onError
+      mockMutate.mockImplementation((_vars, options) => {
+        options?.onError?.(new Error('Failed to revoke application. Please try again.'));
+      });
 
-      const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+      const user = userEvent.setup();
       renderDialog();
 
       const revokeButton = screen.getByRole('button', {name: 'Revoke'});
       await user.click(revokeButton);
-
-      // Advance timers to complete the mock API call
-      await vi.advanceTimersByTimeAsync(1500);
 
       await waitFor(() => {
         expect(mockOnError).toHaveBeenCalledWith('Failed to revoke application. Please try again.');
