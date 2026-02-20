@@ -430,7 +430,8 @@ const translations = {
 
     'delete.dialog.title': 'Delete Organization Unit',
     'delete.dialog.message': 'Are you sure you want to delete this organization unit? This action cannot be undone.',
-    'delete.dialog.disclaimer': 'Warning: All associated data, configurations, and user assignments will be permanently removed.',
+    'delete.dialog.disclaimer':
+      'Warning: All associated data, configurations, and user assignments will be permanently removed.',
     'delete.dialog.error': 'Failed to delete organization unit. Please try again.',
 
     /* -------------------- Edit page -------------------- */
@@ -642,6 +643,24 @@ const translations = {
     'delete.title': 'Delete Application',
     'delete.message': 'Are you sure you want to delete this application? This action cannot be undone.',
     'delete.disclaimer': 'Warning: All associated data, configurations, and access tokens will be permanently removed.',
+    'revoke.dialog.title': 'Revoke Application',
+    'revoke.dialog.message':
+      'Are you sure you want to revoke this application? This will immediately invalidate the current client secret and generate a new one.',
+    'revoke.dialog.disclaimer':
+      'Warning: This action will revoke the current client secret. All existing access tokens will be invalidated and the application will stop working until the new client secret is updated in your application configuration.',
+    'revoke.dialog.confirmButton': 'Revoke',
+    'revoke.dialog.revoking': 'Revoking...',
+    'revoke.dialog.error': 'Failed to revoke application. Please try again.',
+    'revoke.success.title': 'Save Your New Client Secret',
+    'revoke.success.subtitle': "This is the only time you'll see this secret. Store it somewhere safe.",
+    'revoke.success.secretLabel': 'New Client Secret',
+    'revoke.success.copyButton': 'Copy to clipboard',
+    'revoke.success.toggleVisibility': 'Toggle secret visibility',
+    'revoke.success.copySecret': 'Copy Secret',
+    'revoke.success.copied': 'Copied to clipboard',
+    'revoke.success.securityReminder.title': 'Security Reminder',
+    'revoke.success.securityReminder.description':
+      'Never share your client secret publicly or store it in version control. If you believe your secret has been compromised, regenerate it immediately.',
     'onboarding.preview.title': 'Preview',
     'onboarding.preview.signin': 'Sign In',
     'onboarding.preview.username': 'Username',
@@ -964,6 +983,14 @@ const translations = {
     'edit.general.allowedUserTypes.placeholder': 'Select user types',
     'edit.general.allowedUserTypes.hint': 'Users of these types can authenticate with this application',
     'edit.general.applicationUrl.hint': 'The homepage URL of your application',
+    'edit.general.sections.dangerZone.title': 'Danger Zone',
+    'edit.general.sections.dangerZone.description': 'Actions in this section are irreversible. Proceed with caution.',
+    'edit.general.sections.dangerZone.revokeApp.title': 'Revoke Application',
+    // 'edit.general.sections.dangerZone.revokeApp.description':
+    //   'Revoking the application will immediately invalidate the current client secret and generate a new one. All active access tokens will be revoked and the application will stop working until the new client secret is updated in your application configuration.',
+    'edit.general.sections.dangerZone.revokeApp.description':
+      'Revoking the application will immediately invalidate the current client secret and cannot be undone.',
+    'edit.general.sections.dangerZone.revokeApp.button': 'Revoke Application',
 
     // Flows section
     'edit.flows.labels.authFlow': 'Authentication Flow',
