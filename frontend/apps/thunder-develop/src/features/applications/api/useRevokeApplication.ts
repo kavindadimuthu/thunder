@@ -54,23 +54,29 @@ export interface RevokeApplicationResult {
 }
 
 /**
- * Generates a random client secret for demonstration purposes.
- * This is a temporary implementation until a proper secure random string
- * generation utility is implemented.
+ * Generates a cryptographically secure OAuth 2.0 client secret.
  *
  * @remarks
- * In production, this should be replaced with a cryptographically secure
- * random string generator.
+ * Matches the backend implementation in `GenerateOAuth2ClientSecret()`:
+ * - 32 random bytes (256 bits of entropy) via the Web Crypto API
+ * - Encoded as base64url (URL-safe, no padding) using the same scheme as
+ *   Go's `base64.RawURLEncoding`
  *
- * @returns A 32-character random alphanumeric string
+ * The Web Crypto API (`crypto.getRandomValues`) is a CSPRNG available in all
+ * modern browsers and Node.js ≥ 15, making it the correct choice for
+ * security-sensitive values such as OAuth client secrets.
+ *
+ * @returns A base64url-encoded 32-byte (256-bit) client secret string
  */
 function generateClientSecret(): string {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let result = '';
-  for (let i = 0; i < 32; i++) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return result;
+  const bytes = new Uint8Array(32);
+  crypto.getRandomValues(bytes);
+
+  // Convert to base64url without padding, matching Go's base64.RawURLEncoding
+  return btoa(String.fromCharCode(...bytes))
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=/g, '');
 }
 
 /**
