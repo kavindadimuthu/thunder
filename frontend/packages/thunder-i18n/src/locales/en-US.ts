@@ -801,7 +801,7 @@ const translations = {
     'regenerateSecret.dialog.message':
       'Are you sure you want to regenerate the client secret for this application? This will immediately invalidate the current client secret and generate a new one.',
     'regenerateSecret.dialog.disclaimer':
-      'Warning: This action will regenerate the client secret. All existing access tokens will be invalidated and the application will stop working until the new client secret is updated in your application configuration.',
+      'Warning: Regenerating the client secret will invalidate the current secret and the application may stop working until the new client secret is updated in its configuration.',
     'regenerateSecret.dialog.confirmButton': 'Regenerate',
     'regenerateSecret.dialog.regenerating': 'Regenerating...',
     'regenerateSecret.dialog.error': 'Failed to regenerate client secret. Please try again.',
