@@ -58,16 +58,16 @@ vi.mock('../AccessSection', () => ({
 }));
 
 vi.mock('../DangerZoneSection', () => ({
-  default: ({onRevokeClick}: {onRevokeClick: () => void}) => (
+  default: ({onRegenerateClick}: {onRegenerateClick: () => void}) => (
     <div data-testid="danger-zone-section">
-      <button onClick={onRevokeClick} data-testid="revoke-button">
-        Revoke Application
+      <button onClick={onRegenerateClick} data-testid="regenerate-button">
+        Regenerate Client Secret
       </button>
     </div>
   ),
 }));
 
-vi.mock('../../../ApplicationRevokeDialog', () => ({
+vi.mock('../../../RegenerateSecretDialog', () => ({
   default: ({
     open,
     applicationId,
@@ -80,7 +80,7 @@ vi.mock('../../../ApplicationRevokeDialog', () => ({
     onSuccess?: (clientSecret: string) => void;
   }) =>
     open ? (
-      <div data-testid="revoke-dialog" data-application-id={applicationId}>
+      <div data-testid="regenerate-dialog" data-application-id={applicationId}>
         <button onClick={onClose} data-testid="dialog-close">
           Close
         </button>
@@ -308,8 +308,8 @@ describe('EditGeneralSettings', () => {
     });
   });
 
-  describe('Revoke Flow', () => {
-    it('should open revoke dialog when revoke button is clicked', () => {
+  describe('Regenerate Secret Flow', () => {
+    it('should open regenerate dialog when regenerate button is clicked', () => {
       render(
         <EditGeneralSettings
           application={mockApplication}
@@ -320,13 +320,13 @@ describe('EditGeneralSettings', () => {
         />,
       );
 
-      const revokeButton = screen.getByTestId('revoke-button');
-      fireEvent.click(revokeButton);
+      const regenerateButton = screen.getByTestId('regenerate-button');
+      fireEvent.click(regenerateButton);
 
-      expect(screen.getByTestId('revoke-dialog')).toBeInTheDocument();
+      expect(screen.getByTestId('regenerate-dialog')).toBeInTheDocument();
     });
 
-    it('should pass application id to revoke dialog', () => {
+    it('should pass application id to regenerate dialog', () => {
       render(
         <EditGeneralSettings
           application={mockApplication}
@@ -337,13 +337,13 @@ describe('EditGeneralSettings', () => {
         />,
       );
 
-      const revokeButton = screen.getByTestId('revoke-button');
-      fireEvent.click(revokeButton);
+      const regenerateButton = screen.getByTestId('regenerate-button');
+      fireEvent.click(regenerateButton);
 
-      expect(screen.getByTestId('revoke-dialog')).toHaveAttribute('data-application-id', 'app-123');
+      expect(screen.getByTestId('regenerate-dialog')).toHaveAttribute('data-application-id', 'app-123');
     });
 
-    it('should close revoke dialog when close is triggered', () => {
+    it('should close regenerate dialog when close is triggered', () => {
       render(
         <EditGeneralSettings
           application={mockApplication}
@@ -354,18 +354,18 @@ describe('EditGeneralSettings', () => {
         />,
       );
 
-      const revokeButton = screen.getByTestId('revoke-button');
-      fireEvent.click(revokeButton);
+      const regenerateButton = screen.getByTestId('regenerate-button');
+      fireEvent.click(regenerateButton);
 
-      expect(screen.getByTestId('revoke-dialog')).toBeInTheDocument();
+      expect(screen.getByTestId('regenerate-dialog')).toBeInTheDocument();
 
       const closeButton = screen.getByTestId('dialog-close');
       fireEvent.click(closeButton);
 
-      expect(screen.queryByTestId('revoke-dialog')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('regenerate-dialog')).not.toBeInTheDocument();
     });
 
-    it('should open secret dialog when revoke is successful', () => {
+    it('should open secret dialog when regeneration is successful', () => {
       render(
         <EditGeneralSettings
           application={mockApplication}
@@ -376,8 +376,8 @@ describe('EditGeneralSettings', () => {
         />,
       );
 
-      const revokeButton = screen.getByTestId('revoke-button');
-      fireEvent.click(revokeButton);
+      const regenerateButton = screen.getByTestId('regenerate-button');
+      fireEvent.click(regenerateButton);
 
       const successButton = screen.getByTestId('dialog-success');
       fireEvent.click(successButton);
@@ -397,9 +397,9 @@ describe('EditGeneralSettings', () => {
         />,
       );
 
-      // Open revoke dialog and trigger success
-      const revokeButton = screen.getByTestId('revoke-button');
-      fireEvent.click(revokeButton);
+      // Open regenerate dialog and trigger success
+      const regenerateButton = screen.getByTestId('regenerate-button');
+      fireEvent.click(regenerateButton);
 
       const successButton = screen.getByTestId('dialog-success');
       fireEvent.click(successButton);

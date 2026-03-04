@@ -28,10 +28,10 @@ vi.mock('react-i18next', () => ({
         'applications:edit.general.sections.dangerZone.title': 'Danger Zone',
         'applications:edit.general.sections.dangerZone.description':
           'Irreversible and destructive actions for this application',
-        'applications:edit.general.sections.dangerZone.revokeApp.title': 'Revoke Application',
-        'applications:edit.general.sections.dangerZone.revokeApp.description':
-          'Revoking the application will invalidate the current client secret and generate a new one. All existing access tokens will be revoked and the application will stop working until the new client secret is updated in your application configuration.',
-        'applications:edit.general.sections.dangerZone.revokeApp.button': 'Revoke Application',
+        'applications:edit.general.sections.dangerZone.regenerateSecret.title': 'Regenerate Client Secret',
+        'applications:edit.general.sections.dangerZone.regenerateSecret.description':
+          'Regenerating the client secret will immediately invalidate the current client secret and generate a new one. All active access tokens will be revoked and the application will stop working until the new client secret is updated in your application configuration.',
+        'applications:edit.general.sections.dangerZone.regenerateSecret.button': 'Regenerate Client Secret',
       };
       return translations[key] ?? key;
     },
@@ -39,7 +39,7 @@ vi.mock('react-i18next', () => ({
 }));
 
 describe('DangerZoneSection', () => {
-  const mockOnRevokeClick = vi.fn();
+  const mockOnRegenerateClick = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -50,60 +50,60 @@ describe('DangerZoneSection', () => {
   });
 
   it('should render the danger zone section', () => {
-    renderWithProviders(<DangerZoneSection onRevokeClick={mockOnRevokeClick} />);
+    renderWithProviders(<DangerZoneSection onRegenerateClick={mockOnRegenerateClick} />);
 
     expect(screen.getByText('Danger Zone')).toBeInTheDocument();
     expect(screen.getByText('Irreversible and destructive actions for this application')).toBeInTheDocument();
   });
 
   it('should render revoke application title', () => {
-    renderWithProviders(<DangerZoneSection onRevokeClick={mockOnRevokeClick} />);
+    renderWithProviders(<DangerZoneSection onRegenerateClick={mockOnRegenerateClick} />);
 
-    const heading = screen.getByRole('heading', {name: 'Revoke Application', level: 6});
+    const heading = screen.getByRole('heading', {name: 'Regenerate Client Secret', level: 6});
     expect(heading).toBeInTheDocument();
   });
 
   it('should render warning description', () => {
-    renderWithProviders(<DangerZoneSection onRevokeClick={mockOnRevokeClick} />);
+    renderWithProviders(<DangerZoneSection onRegenerateClick={mockOnRegenerateClick} />);
 
     expect(
       screen.getByText(
-        'Revoking the application will invalidate the current client secret and generate a new one. All existing access tokens will be revoked and the application will stop working until the new client secret is updated in your application configuration.',
+        'Regenerating the client secret will immediately invalidate the current client secret and generate a new one. All active access tokens will be revoked and the application will stop working until the new client secret is updated in your application configuration.',
       ),
     ).toBeInTheDocument();
   });
 
   it('should render revoke button', () => {
-    renderWithProviders(<DangerZoneSection onRevokeClick={mockOnRevokeClick} />);
+    renderWithProviders(<DangerZoneSection onRegenerateClick={mockOnRegenerateClick} />);
 
-    const revokeButton = screen.getByRole('button', {name: 'Revoke Application'});
-    expect(revokeButton).toBeInTheDocument();
+    const regenerateButton = screen.getByRole('button', {name: 'Regenerate Client Secret'});
+    expect(regenerateButton).toBeInTheDocument();
   });
 
-  it('should call onRevokeClick when revoke button is clicked', () => {
-    renderWithProviders(<DangerZoneSection onRevokeClick={mockOnRevokeClick} />);
+  it('should call onRegenerateClick when revoke button is clicked', () => {
+    renderWithProviders(<DangerZoneSection onRegenerateClick={mockOnRegenerateClick} />);
 
-    const revokeButton = screen.getByRole('button', {name: 'Revoke Application'});
-    fireEvent.click(revokeButton);
+    const regenerateButton = screen.getByRole('button', {name: 'Regenerate Client Secret'});
+    fireEvent.click(regenerateButton);
 
-    expect(mockOnRevokeClick).toHaveBeenCalledTimes(1);
+    expect(mockOnRegenerateClick).toHaveBeenCalledTimes(1);
   });
 
-  it('should call onRevokeClick multiple times when clicked multiple times', () => {
-    renderWithProviders(<DangerZoneSection onRevokeClick={mockOnRevokeClick} />);
+  it('should call onRegenerateClick multiple times when clicked multiple times', () => {
+    renderWithProviders(<DangerZoneSection onRegenerateClick={mockOnRegenerateClick} />);
 
-    const revokeButton = screen.getByRole('button', {name: 'Revoke Application'});
-    fireEvent.click(revokeButton);
-    fireEvent.click(revokeButton);
-    fireEvent.click(revokeButton);
+    const regenerateButton = screen.getByRole('button', {name: 'Regenerate Client Secret'});
+    fireEvent.click(regenerateButton);
+    fireEvent.click(regenerateButton);
+    fireEvent.click(regenerateButton);
 
-    expect(mockOnRevokeClick).toHaveBeenCalledTimes(3);
+    expect(mockOnRegenerateClick).toHaveBeenCalledTimes(3);
   });
 
   it('should render revoke button with error color', () => {
-    renderWithProviders(<DangerZoneSection onRevokeClick={mockOnRevokeClick} />);
+    renderWithProviders(<DangerZoneSection onRegenerateClick={mockOnRegenerateClick} />);
 
-    const revokeButton = screen.getByRole('button', {name: 'Revoke Application'});
-    expect(revokeButton).toHaveClass('MuiButton-colorError');
+    const regenerateButton = screen.getByRole('button', {name: 'Regenerate Client Secret'});
+    expect(regenerateButton).toHaveClass('MuiButton-colorError');
   });
 });

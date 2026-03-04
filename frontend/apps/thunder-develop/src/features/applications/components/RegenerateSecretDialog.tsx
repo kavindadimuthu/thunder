@@ -20,18 +20,18 @@ import {useState, useEffect, type JSX} from 'react';
 import {Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, Alert} from '@wso2/oxygen-ui';
 import {useTranslation} from 'react-i18next';
 import {useLogger} from '@thunder/logger';
-import useRevokeApplication from '../api/useRevokeApplication';
+import useRegenerateClientSecret from '../api/useRegenerateClientSecret';
 
 /**
- * Props for the {@link ApplicationRevokeDialog} component.
+ * Props for the {@link RegenerateSecretDialog} component.
  */
-export interface ApplicationRevokeDialogProps {
+export interface RegenerateSecretDialogProps {
   /**
    * Whether the dialog is open
    */
   open: boolean;
   /**
-   * The ID of the application to revoke
+   * The ID of the application whose client secret will be regenerated
    */
   applicationId: string | null;
   /**
@@ -39,35 +39,35 @@ export interface ApplicationRevokeDialogProps {
    */
   onClose: () => void;
   /**
-   * Callback when the application is successfully revoked with new client secret
+   * Callback when the client secret is successfully regenerated with the new client secret
    */
   onSuccess?: (newClientSecret: string) => void;
   /**
-   * Callback when the revocation fails
+   * Callback when the regeneration fails
    */
   onError?: (message: string) => void;
 }
 
 /**
- * Dialog component for confirming application revocation.
+ * Dialog component for confirming client secret regeneration.
  *
- * This dialog warns users about the consequences of revoking an application's
+ * This dialog warns users about the consequences of regenerating an application's
  * client secret before proceeding with the action.
  *
  * @param props - Component props
- * @returns The revoke confirmation dialog
+ * @returns The regenerate client secret confirmation dialog
  */
-export default function ApplicationRevokeDialog({
+export default function RegenerateSecretDialog({
   open,
   applicationId,
   onClose,
   onSuccess = undefined,
   onError = undefined,
-}: ApplicationRevokeDialogProps): JSX.Element {
+}: RegenerateSecretDialogProps): JSX.Element {
   const {t} = useTranslation();
-  const logger = useLogger('ApplicationRevokeDialog');
+  const logger = useLogger('RegenerateSecretDialog');
   const [error, setError] = useState<string | null>(null);
-  const revokeApplication = useRevokeApplication();
+  const regenerateClientSecret = useRegenerateClientSecret();
 
   // Reset error state when dialog is opened
   useEffect(() => {
@@ -85,21 +85,21 @@ export default function ApplicationRevokeDialog({
     if (!applicationId) return;
 
     setError(null);
-    logger.info('Revoking application client secret', {applicationId});
+    logger.info('Regenerating application client secret', {applicationId});
 
-    revokeApplication.mutate(
+    regenerateClientSecret.mutate(
       {applicationId},
       {
         onSuccess: ({clientSecret}) => {
-          logger.info('Application revoked successfully. New client secret generated.', {
+          logger.info('Application client secret regenerated successfully. New client secret generated.', {
             applicationId,
           });
           onClose();
           onSuccess?.(clientSecret);
         },
         onError: (err) => {
-          const errorMessage = err instanceof Error ? err.message : t('applications:revoke.dialog.error');
-          logger.error('Failed to revoke application', {applicationId, error: err});
+          const errorMessage = err instanceof Error ? err.message : t('applications:regenerateSecret.dialog.error');
+          logger.error('Failed to regenerate client secret', {applicationId, error: err});
           setError(errorMessage);
           onError?.(errorMessage);
         },
@@ -109,11 +109,11 @@ export default function ApplicationRevokeDialog({
 
   return (
     <Dialog open={open} onClose={handleCancel} maxWidth="sm" fullWidth>
-      <DialogTitle>{t('applications:revoke.dialog.title')}</DialogTitle>
+      <DialogTitle>{t('applications:regenerateSecret.dialog.title')}</DialogTitle>
       <DialogContent>
-        <DialogContentText sx={{mb: 2}}>{t('applications:revoke.dialog.message')}</DialogContentText>
+        <DialogContentText sx={{mb: 2}}>{t('applications:regenerateSecret.dialog.message')}</DialogContentText>
         <Alert severity="warning" sx={{mb: 2}}>
-          {t('applications:revoke.dialog.disclaimer')}
+          {t('applications:regenerateSecret.dialog.disclaimer')}
         </Alert>
         {error && (
           <Alert severity="error" sx={{mt: 2}}>
@@ -122,13 +122,13 @@ export default function ApplicationRevokeDialog({
         )}
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleCancel} disabled={revokeApplication.isPending}>
+        <Button onClick={handleCancel} disabled={regenerateClientSecret.isPending}>
           {t('common:actions.cancel')}
         </Button>
-        <Button onClick={handleConfirm} color="error" variant="contained" disabled={revokeApplication.isPending}>
-          {revokeApplication.isPending
-            ? t('applications:revoke.dialog.revoking')
-            : t('applications:revoke.dialog.confirmButton')}
+        <Button onClick={handleConfirm} color="error" variant="contained" disabled={regenerateClientSecret.isPending}>
+          {regenerateClientSecret.isPending
+            ? t('applications:regenerateSecret.dialog.regenerating')
+            : t('applications:regenerateSecret.dialog.confirmButton')}
         </Button>
       </DialogActions>
     </Dialog>

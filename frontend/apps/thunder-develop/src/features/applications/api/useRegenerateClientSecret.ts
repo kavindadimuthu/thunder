@@ -25,30 +25,30 @@ import type {InboundAuthConfig} from '../models/inbound-auth';
 import ApplicationQueryKeys from '../constants/application-query-keys';
 
 /**
- * Variables for the {@link useRevokeApplication} mutation.
+ * Variables for the {@link useRegenerateClientSecret} mutation.
  *
  * @public
  */
-export interface RevokeApplicationVariables {
+export interface RegenerateSecretVariables {
   /**
-   * The unique identifier of the application to revoke
+   * The unique identifier of the application whose client secret will be regenerated
    */
   applicationId: string;
 }
 
 /**
- * Result of the {@link useRevokeApplication} mutation.
+ * Result of the {@link useRegenerateClientSecret} mutation.
  *
  * @public
  */
-export interface RevokeApplicationResult {
+export interface RegenerateSecretResult {
   /**
-   * The updated application after revocation
+   * The updated application after client secret regeneration
    */
   application: Application;
   /**
-   * The new client secret generated during revocation
-   * This is only available immediately after revocation and should be saved by the user
+   * The new client secret generated during regeneration
+   * This is only available immediately after regeneration and should be saved by the user
    */
   clientSecret: string;
 }
@@ -94,48 +94,48 @@ function toUpdateRequest(application: Application): CreateApplicationRequest {
 }
 
 /**
- * Custom React hook to revoke an application's client secret.
+ * Custom React hook to regenerate an application's client secret.
  *
- * This hook handles the application revocation process by:
+ * This hook handles the client secret regeneration process by:
  * 1. Fetching the current application details
  * 2. Generating a new client secret
  * 3. Updating the application with the new client secret via the update API
  *
- * Upon successful revocation, the cache is invalidated to ensure the UI
+ * Upon successful regeneration, the cache is invalidated to ensure the UI
  * reflects the latest changes.
  *
  * @remarks
- * Currently, there is no dedicated API endpoint to revoke an application.
+ * Currently, there is no dedicated API endpoint to regenerate a client secret.
  * This hook uses the update application endpoint to regenerate the client secret.
- * When a dedicated revoke endpoint is implemented in the backend, this hook
+ * When a dedicated regenerate endpoint is implemented in the backend, this hook
  * can be updated to use that endpoint without changing the UI components.
  *
- * @returns TanStack Query mutation object for revoking applications with mutate function, loading state, and error information
+ * @returns TanStack Query mutation object for regenerating client secrets with mutate function, loading state, and error information
  *
  * @example
  * ```tsx
- * function RevokeButton({ applicationId }: { applicationId: string }) {
- *   const revokeApp = useRevokeApplication();
+ * function RegenerateButton({ applicationId }: { applicationId: string }) {
+ *   const regenerateSecret = useRegenerateClientSecret();
  *
- *   const handleRevoke = () => {
- *     revokeApp.mutate(
+ *   const handleRegenerate = () => {
+ *     regenerateSecret.mutate(
  *       { applicationId },
  *       {
  *         onSuccess: ({ application, clientSecret }) => {
- *           console.log('Application revoked:', application.id);
+ *           console.log('Client secret regenerated for:', application.id);
  *           console.log('New client secret:', clientSecret);
  *           // Display the new client secret to the user
  *         },
  *         onError: (error) => {
- *           console.error('Failed to revoke application:', error);
+ *           console.error('Failed to regenerate client secret:', error);
  *         }
  *       }
  *     );
  *   };
  *
  *   return (
- *     <button onClick={handleRevoke} disabled={revokeApp.isPending}>
- *       {revokeApp.isPending ? 'Revoking...' : 'Revoke Application'}
+ *     <button onClick={handleRegenerate} disabled={regenerateSecret.isPending}>
+ *       {regenerateSecret.isPending ? 'Regenerating...' : 'Regenerate Client Secret'}
  *     </button>
  *   );
  * }
@@ -143,17 +143,17 @@ function toUpdateRequest(application: Application): CreateApplicationRequest {
  *
  * @public
  */
-export default function useRevokeApplication(): UseMutationResult<
-  RevokeApplicationResult,
+export default function useRegenerateClientSecret(): UseMutationResult<
+  RegenerateSecretResult,
   Error,
-  RevokeApplicationVariables
+  RegenerateSecretVariables
 > {
   const {http} = useAsgardeo();
   const {getServerUrl} = useConfig();
   const queryClient = useQueryClient();
 
-  return useMutation<RevokeApplicationResult, Error, RevokeApplicationVariables>({
-    mutationFn: async ({applicationId}: RevokeApplicationVariables): Promise<RevokeApplicationResult> => {
+  return useMutation<RegenerateSecretResult, Error, RegenerateSecretVariables>({
+    mutationFn: async ({applicationId}: RegenerateSecretVariables): Promise<RegenerateSecretResult> => {
       const serverUrl: string = getServerUrl();
 
       // Step 1: Fetch the current application details

@@ -797,23 +797,23 @@ const translations = {
     'delete.title': 'Delete Application',
     'delete.message': 'Are you sure you want to delete this application? This action cannot be undone.',
     'delete.disclaimer': 'Warning: All associated data, configurations, and access tokens will be permanently removed.',
-    'revoke.dialog.title': 'Revoke Application',
-    'revoke.dialog.message':
-      'Are you sure you want to revoke this application? This will immediately invalidate the current client secret and generate a new one.',
-    'revoke.dialog.disclaimer':
-      'Warning: This action will revoke the current client secret. All existing access tokens will be invalidated and the application will stop working until the new client secret is updated in your application configuration.',
-    'revoke.dialog.confirmButton': 'Revoke',
-    'revoke.dialog.revoking': 'Revoking...',
-    'revoke.dialog.error': 'Failed to revoke application. Please try again.',
-    'revoke.success.title': 'Save Your New Client Secret',
-    'revoke.success.subtitle': "This is the only time you'll see this secret. Store it somewhere safe.",
-    'revoke.success.secretLabel': 'New Client Secret',
-    'revoke.success.copyButton': 'Copy to clipboard',
-    'revoke.success.toggleVisibility': 'Toggle secret visibility',
-    'revoke.success.copySecret': 'Copy Secret',
-    'revoke.success.copied': 'Copied to clipboard',
-    'revoke.success.securityReminder.title': 'Security Reminder',
-    'revoke.success.securityReminder.description':
+    'regenerateSecret.dialog.title': 'Regenerate Client Secret',
+    'regenerateSecret.dialog.message':
+      'Are you sure you want to regenerate the client secret for this application? This will immediately invalidate the current client secret and generate a new one.',
+    'regenerateSecret.dialog.disclaimer':
+      'Warning: This action will regenerate the client secret. All existing access tokens will be invalidated and the application will stop working until the new client secret is updated in your application configuration.',
+    'regenerateSecret.dialog.confirmButton': 'Regenerate',
+    'regenerateSecret.dialog.regenerating': 'Regenerating...',
+    'regenerateSecret.dialog.error': 'Failed to regenerate client secret. Please try again.',
+    'regenerateSecret.success.title': 'Save Your New Client Secret',
+    'regenerateSecret.success.subtitle': "This is the only time you'll see this secret. Store it somewhere safe.",
+    'regenerateSecret.success.secretLabel': 'New Client Secret',
+    'regenerateSecret.success.copyButton': 'Copy to clipboard',
+    'regenerateSecret.success.toggleVisibility': 'Toggle secret visibility',
+    'regenerateSecret.success.copySecret': 'Copy Secret',
+    'regenerateSecret.success.copied': 'Copied to clipboard',
+    'regenerateSecret.success.securityReminder.title': 'Security Reminder',
+    'regenerateSecret.success.securityReminder.description':
       'Never share your client secret publicly or store it in version control. If you believe your secret has been compromised, regenerate it immediately.',
     'onboarding.preview.title': 'Preview',
     'onboarding.preview.signin': 'Sign In',
@@ -1140,12 +1140,10 @@ const translations = {
     'edit.general.applicationUrl.hint': 'The homepage URL of your application',
     'edit.general.sections.dangerZone.title': 'Danger Zone',
     'edit.general.sections.dangerZone.description': 'Actions in this section are irreversible. Proceed with caution.',
-    'edit.general.sections.dangerZone.revokeApp.title': 'Revoke Application',
-    // 'edit.general.sections.dangerZone.revokeApp.description':
-    //   'Revoking the application will immediately invalidate the current client secret and generate a new one. All active access tokens will be revoked and the application will stop working until the new client secret is updated in your application configuration.',
-    'edit.general.sections.dangerZone.revokeApp.description':
-      'Revoking the application will immediately invalidate the current client secret and cannot be undone.',
-    'edit.general.sections.dangerZone.revokeApp.button': 'Revoke Application',
+    'edit.general.sections.dangerZone.regenerateSecret.title': 'Regenerate Client Secret',
+    'edit.general.sections.dangerZone.regenerateSecret.description':
+      'Regenerating the client secret will immediately invalidate the current client secret and cannot be undone.',
+    'edit.general.sections.dangerZone.regenerateSecret.button': 'Regenerate Client Secret',
 
     // Flows section
     'edit.flows.labels.authFlow': 'Authentication Flow',

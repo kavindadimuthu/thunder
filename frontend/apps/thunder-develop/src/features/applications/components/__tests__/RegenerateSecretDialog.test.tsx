@@ -19,8 +19,8 @@
 import {render, screen, waitFor} from '@thunder/test-utils';
 import {describe, it, expect, vi, beforeEach, afterEach} from 'vitest';
 import userEvent from '@testing-library/user-event';
-import ApplicationRevokeDialog from '../ApplicationRevokeDialog';
-import type {ApplicationRevokeDialogProps} from '../ApplicationRevokeDialog';
+import RegenerateSecretDialog from '../RegenerateSecretDialog';
+import type {RegenerateSecretDialogProps} from '../RegenerateSecretDialog';
 
 // Mock the logger
 vi.mock('@thunder/logger', async (importOriginal) => {
@@ -38,14 +38,14 @@ vi.mock('@thunder/logger', async (importOriginal) => {
 
 // Create a mock mutate function
 const mockMutate = vi.fn();
-const mockRevokeApplication = {
+const mockRegenerateClientSecret = {
   mutate: mockMutate,
   isPending: false,
 };
 
-// Mock useRevokeApplication hook
-vi.mock('../../api/useRevokeApplication', () => ({
-  default: () => mockRevokeApplication,
+// Mock useRegenerateClientSecret hook
+vi.mock('../../api/useRegenerateClientSecret', () => ({
+  default: () => mockRegenerateClientSecret,
 }));
 
 // Mock translations
@@ -53,14 +53,14 @@ vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
-        'applications:revoke.dialog.title': 'Revoke Application',
-        'applications:revoke.dialog.message':
-          'Are you sure you want to revoke this application? This will regenerate the client secret.',
-        'applications:revoke.dialog.disclaimer':
-          'This action will invalidate the current client secret. All existing access tokens will be revoked and the application will stop working until the new client secret is updated in your application configuration.',
-        'applications:revoke.dialog.confirmButton': 'Revoke',
-        'applications:revoke.dialog.revoking': 'Revoking...',
-        'applications:revoke.dialog.error': 'Failed to revoke application. Please try again.',
+        'applications:regenerateSecret.dialog.title': 'Regenerate Client Secret',
+        'applications:regenerateSecret.dialog.message':
+          'Are you sure you want to regenerate the client secret for this application? This will regenerate the client secret.',
+        'applications:regenerateSecret.dialog.disclaimer':
+          'This action will regenerate the client secret. All existing access tokens will be invalidated and the application will stop working until the new client secret is updated in your application configuration.',
+        'applications:regenerateSecret.dialog.confirmButton': 'Regenerate',
+        'applications:regenerateSecret.dialog.regenerating': 'Regenerating...',
+        'applications:regenerateSecret.dialog.error': 'Failed to regenerate client secret. Please try again.',
         'common:actions.cancel': 'Cancel',
       };
       return translations[key] || key;
@@ -68,12 +68,12 @@ vi.mock('react-i18next', () => ({
   }),
 }));
 
-describe('ApplicationRevokeDialog', () => {
+describe('RegenerateSecretDialog', () => {
   const mockOnClose = vi.fn();
   const mockOnSuccess = vi.fn();
   const mockOnError = vi.fn();
 
-  const defaultProps: ApplicationRevokeDialogProps = {
+  const defaultProps: RegenerateSecretDialogProps = {
     open: true,
     applicationId: 'test-app-id',
     onClose: mockOnClose,
@@ -81,12 +81,12 @@ describe('ApplicationRevokeDialog', () => {
     onError: mockOnError,
   };
 
-  const renderDialog = (props: ApplicationRevokeDialogProps = defaultProps) =>
-    render(<ApplicationRevokeDialog {...props} />);
+  const renderDialog = (props: RegenerateSecretDialogProps = defaultProps) =>
+    render(<RegenerateSecretDialog {...props} />);
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mockRevokeApplication.isPending = false;
+    mockRegenerateClientSecret.isPending = false;
   });
 
   afterEach(() => {
@@ -98,9 +98,11 @@ describe('ApplicationRevokeDialog', () => {
       renderDialog();
 
       expect(screen.getByRole('dialog')).toBeInTheDocument();
-      expect(screen.getByText('Revoke Application')).toBeInTheDocument();
+      expect(screen.getByText('Regenerate Client Secret')).toBeInTheDocument();
       expect(
-        screen.getByText('Are you sure you want to revoke this application? This will regenerate the client secret.'),
+        screen.getByText(
+          'Are you sure you want to regenerate the client secret for this application? This will regenerate the client secret.',
+        ),
       ).toBeInTheDocument();
     });
 
@@ -109,7 +111,7 @@ describe('ApplicationRevokeDialog', () => {
 
       expect(
         screen.getByText(
-          'This action will invalidate the current client secret. All existing access tokens will be revoked and the application will stop working until the new client secret is updated in your application configuration.',
+          'This action will regenerate the client secret. All existing access tokens will be invalidated and the application will stop working until the new client secret is updated in your application configuration.',
         ),
       ).toBeInTheDocument();
     });
@@ -120,11 +122,11 @@ describe('ApplicationRevokeDialog', () => {
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     });
 
-    it('should render Cancel and Revoke buttons', () => {
+    it('should render Cancel and Regenerate buttons', () => {
       renderDialog();
 
       expect(screen.getByRole('button', {name: 'Cancel'})).toBeInTheDocument();
-      expect(screen.getByRole('button', {name: 'Revoke'})).toBeInTheDocument();
+      expect(screen.getByRole('button', {name: 'Regenerate'})).toBeInTheDocument();
     });
   });
 
@@ -148,12 +150,12 @@ describe('ApplicationRevokeDialog', () => {
       expect(mockOnClose).toHaveBeenCalledTimes(1);
     });
 
-    it('should call mutate when Revoke button is clicked', async () => {
+    it('should call mutate when Regenerate button is clicked', async () => {
       const user = userEvent.setup();
       renderDialog();
 
-      const revokeButton = screen.getByRole('button', {name: 'Revoke'});
-      await user.click(revokeButton);
+      const regenerateButton = screen.getByRole('button', {name: 'Regenerate'});
+      await user.click(regenerateButton);
 
       expect(mockMutate).toHaveBeenCalledWith(
         {applicationId: 'test-app-id'},
@@ -164,19 +166,19 @@ describe('ApplicationRevokeDialog', () => {
       );
     });
 
-    it('should not initiate revocation when applicationId is null', async () => {
+    it('should not initiate regeneration when applicationId is null', async () => {
       const user = userEvent.setup();
       renderDialog({...defaultProps, applicationId: null});
 
-      const revokeButton = screen.getByRole('button', {name: 'Revoke'});
-      await user.click(revokeButton);
+      const regenerateButton = screen.getByRole('button', {name: 'Regenerate'});
+      await user.click(regenerateButton);
 
       expect(mockMutate).not.toHaveBeenCalled();
     });
   });
 
   describe('Success Flow', () => {
-    it('should call onSuccess with new client secret after successful revocation', async () => {
+    it('should call onSuccess with new client secret after successful regeneration', async () => {
       // Mock mutate to immediately call onSuccess
       mockMutate.mockImplementation((_vars, options) => {
         options?.onSuccess?.({clientSecret: 'new-test-secret-123'});
@@ -185,8 +187,8 @@ describe('ApplicationRevokeDialog', () => {
       const user = userEvent.setup();
       renderDialog();
 
-      const revokeButton = screen.getByRole('button', {name: 'Revoke'});
-      await user.click(revokeButton);
+      const regenerateButton = screen.getByRole('button', {name: 'Regenerate'});
+      await user.click(regenerateButton);
 
       await waitFor(() => {
         expect(mockOnClose).toHaveBeenCalled();
@@ -196,37 +198,37 @@ describe('ApplicationRevokeDialog', () => {
   });
 
   describe('Error Handling', () => {
-    it('should display error message when revocation fails', async () => {
+    it('should display error message when regeneration fails', async () => {
       // Mock mutate to immediately call onError
       mockMutate.mockImplementation((_vars, options) => {
-        options?.onError?.(new Error('Failed to revoke application. Please try again.'));
+        options?.onError?.(new Error('Failed to regenerate client secret. Please try again.'));
       });
 
       const user = userEvent.setup();
       renderDialog();
 
-      const revokeButton = screen.getByRole('button', {name: 'Revoke'});
-      await user.click(revokeButton);
+      const regenerateButton = screen.getByRole('button', {name: 'Regenerate'});
+      await user.click(regenerateButton);
 
       await waitFor(() => {
-        expect(screen.getByText('Failed to revoke application. Please try again.')).toBeInTheDocument();
+        expect(screen.getByText('Failed to regenerate client secret. Please try again.')).toBeInTheDocument();
       });
     });
 
-    it('should call onError callback when revocation fails', async () => {
+    it('should call onError callback when regeneration fails', async () => {
       // Mock mutate to immediately call onError
       mockMutate.mockImplementation((_vars, options) => {
-        options?.onError?.(new Error('Failed to revoke application. Please try again.'));
+        options?.onError?.(new Error('Failed to regenerate client secret. Please try again.'));
       });
 
       const user = userEvent.setup();
       renderDialog();
 
-      const revokeButton = screen.getByRole('button', {name: 'Revoke'});
-      await user.click(revokeButton);
+      const regenerateButton = screen.getByRole('button', {name: 'Regenerate'});
+      await user.click(regenerateButton);
 
       await waitFor(() => {
-        expect(mockOnError).toHaveBeenCalledWith('Failed to revoke application. Please try again.');
+        expect(mockOnError).toHaveBeenCalledWith('Failed to regenerate client secret. Please try again.');
       });
     });
   });

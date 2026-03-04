@@ -52,7 +52,7 @@ export interface ClientSecretSuccessDialogProps {
 }
 
 /**
- * Dialog component for displaying the new client secret after successful revocation.
+ * Dialog component for displaying the new client secret after successful regeneration.
  *
  * This dialog shows the new client secret with a copy button and warns users
  * that the secret will not be shown again after closing the dialog.
@@ -111,10 +111,10 @@ export default function ClientSecretSuccessDialog({
           {/* Header */}
           <Stack direction="column" spacing={1} sx={{textAlign: 'center'}}>
             <Typography variant="h5" component="h2">
-              {t('applications:revoke.success.title')}
+              {t('applications:regenerateSecret.success.title')}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              {t('applications:revoke.success.subtitle')}
+              {t('applications:regenerateSecret.success.subtitle')}
             </Typography>
           </Stack>
 
@@ -130,7 +130,7 @@ export default function ClientSecretSuccessDialog({
           >
             <Box>
               <Typography variant="caption" color="text.secondary" sx={{display: 'block', mb: 1}}>
-                {t('applications:revoke.success.secretLabel')}
+                {t('applications:regenerateSecret.success.secretLabel')}
               </Typography>
               <TextField
                 fullWidth
@@ -145,7 +145,7 @@ export default function ClientSecretSuccessDialog({
                           onClick={handleToggleVisibility}
                           edge="end"
                           size="small"
-                          aria-label={t('applications:revoke.success.toggleVisibility')}
+                          aria-label={t('applications:regenerateSecret.success.toggleVisibility')}
                         >
                           {showSecret ? <EyeOff size={16} /> : <Eye size={16} />}
                         </IconButton>
@@ -158,7 +158,7 @@ export default function ClientSecretSuccessDialog({
                           edge="end"
                           size="small"
                           sx={{ml: 0.5}}
-                          aria-label={t('applications:revoke.success.copyButton')}
+                          aria-label={t('applications:regenerateSecret.success.copyButton')}
                         >
                           <Copy size={16} />
                         </IconButton>
@@ -177,9 +177,11 @@ export default function ClientSecretSuccessDialog({
           {/* Security Reminder Alert */}
           <Alert severity="warning" icon={<AlertTriangle size={20} />}>
             <Typography variant="body2" sx={{fontWeight: 'medium', mb: 1}}>
-              {t('applications:revoke.success.securityReminder.title')}
+              {t('applications:regenerateSecret.success.securityReminder.title')}
             </Typography>
-            <Typography variant="body2">{t('applications:revoke.success.securityReminder.description')}</Typography>
+            <Typography variant="body2">
+              {t('applications:regenerateSecret.success.securityReminder.description')}
+            </Typography>
           </Alert>
         </Stack>
       </DialogContent>
@@ -196,7 +198,9 @@ export default function ClientSecretSuccessDialog({
             }}
             disabled={copied}
           >
-            {copied ? t('applications:revoke.success.copied') : t('applications:revoke.success.copySecret')}
+            {copied
+              ? t('applications:regenerateSecret.success.copied')
+              : t('applications:regenerateSecret.success.copySecret')}
           </Button>
           <Button variant="outlined" fullWidth onClick={handleClose}>
             {t('common:actions.done')}

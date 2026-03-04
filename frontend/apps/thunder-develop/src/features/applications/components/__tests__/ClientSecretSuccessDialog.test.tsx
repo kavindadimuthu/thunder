@@ -26,16 +26,16 @@ vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
-        'applications:revoke.success.title': 'Save Your New Client Secret',
-        'applications:revoke.success.subtitle':
+        'applications:regenerateSecret.success.title': 'Save Your New Client Secret',
+        'applications:regenerateSecret.success.subtitle':
           "This is the only time you'll see this secret. Store it somewhere safe.",
-        'applications:revoke.success.secretLabel': 'New Client Secret',
-        'applications:revoke.success.copyButton': 'Copy to clipboard',
-        'applications:revoke.success.toggleVisibility': 'Toggle secret visibility',
-        'applications:revoke.success.copySecret': 'Copy Secret',
-        'applications:revoke.success.copied': 'Copied to clipboard',
-        'applications:revoke.success.securityReminder.title': 'Security Reminder',
-        'applications:revoke.success.securityReminder.description':
+        'applications:regenerateSecret.success.secretLabel': 'New Client Secret',
+        'applications:regenerateSecret.success.copyButton': 'Copy to clipboard',
+        'applications:regenerateSecret.success.toggleVisibility': 'Toggle secret visibility',
+        'applications:regenerateSecret.success.copySecret': 'Copy Secret',
+        'applications:regenerateSecret.success.copied': 'Copied to clipboard',
+        'applications:regenerateSecret.success.securityReminder.title': 'Security Reminder',
+        'applications:regenerateSecret.success.securityReminder.description':
           'Never share your client secret publicly or store it in version control.',
         'common:actions.done': 'Done',
       };

@@ -26,21 +26,21 @@ import SettingsCard from '@/components/SettingsCard';
  */
 interface DangerZoneSectionProps {
   /**
-   * Callback function to open the revoke application confirmation dialog
+   * Callback function to open the regenerate client secret confirmation dialog
    */
-  onRevokeClick: () => void;
+  onRegenerateClick: () => void;
 }
 
 /**
  * Section component displaying the danger zone with destructive actions.
  *
- * Displays a revoke button for regenerating the application's client secret.
+ * Displays a regenerate client secret button for rotating the application's client secret.
  * This action will invalidate the current client secret and all existing tokens.
  *
  * @param props - Component props
  * @returns Danger zone UI within a SettingsCard
  */
-export default function DangerZoneSection({onRevokeClick}: DangerZoneSectionProps): JSX.Element {
+export default function DangerZoneSection({onRegenerateClick}: DangerZoneSectionProps): JSX.Element {
   const {t} = useTranslation();
 
   return (
@@ -49,13 +49,13 @@ export default function DangerZoneSection({onRevokeClick}: DangerZoneSectionProp
       description={t('applications:edit.general.sections.dangerZone.description')}
     >
       <Typography variant="h6" gutterBottom color="error">
-        {t('applications:edit.general.sections.dangerZone.revokeApp.title')}
+        {t('applications:edit.general.sections.dangerZone.regenerateSecret.title')}
       </Typography>
       <Typography variant="body2" color="text.secondary" sx={{mb: 3}}>
-        {t('applications:edit.general.sections.dangerZone.revokeApp.description')}
+        {t('applications:edit.general.sections.dangerZone.regenerateSecret.description')}
       </Typography>
-      <Button variant="contained" color="error" onClick={onRevokeClick}>
-        {t('applications:edit.general.sections.dangerZone.revokeApp.button')}
+      <Button variant="contained" color="error" onClick={onRegenerateClick}>
+        {t('applications:edit.general.sections.dangerZone.regenerateSecret.button')}
       </Button>
     </SettingsCard>
   );

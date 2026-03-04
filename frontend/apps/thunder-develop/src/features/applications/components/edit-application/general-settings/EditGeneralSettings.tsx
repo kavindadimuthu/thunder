@@ -24,8 +24,8 @@ import type {OAuth2Config} from '../../../models/oauth';
 import QuickCopySection from './QuickCopySection';
 import AccessSection from './AccessSection';
 import DangerZoneSection from './DangerZoneSection';
-import ApplicationRevokeDialog from '../../ApplicationRevokeDialog';
 import ClientSecretSuccessDialog from '../../ClientSecretSuccessDialog';
+import RegenerateSecretDialog from '../../RegenerateSecretDialog';
 
 /**
  * Props for the {@link EditGeneralSettings} component.
@@ -67,7 +67,7 @@ interface EditGeneralSettingsProps {
  * Displays sections for:
  * - Quick copy of application credentials (ID, Client ID)
  * - Access configuration (URL, redirect URIs, allowed user types)
- * - Danger zone (revoke application / regenerate client secret)
+ * - Danger zone (regenerate client secret)
  *
  * @param props - Component props
  * @returns General settings sections wrapped in a Stack
@@ -80,7 +80,7 @@ export default function EditGeneralSettings({
   copiedField,
   onCopyToClipboard,
 }: EditGeneralSettingsProps): JSX.Element {
-  const [revokeDialogOpen, setRevokeDialogOpen] = useState(false);
+  const [regenerateDialogOpen, setRegenerateDialogOpen] = useState(false);
   const [secretDialogOpen, setSecretDialogOpen] = useState(false);
   const [newClientSecret, setNewClientSecret] = useState<string>('');
   const [errorSnackbar, setErrorSnackbar] = useState<{open: boolean; message: string}>({
@@ -88,16 +88,16 @@ export default function EditGeneralSettings({
     message: '',
   });
 
-  const handleRevokeClick = useCallback((): void => {
-    setRevokeDialogOpen(true);
+  const handleRegenerateClick = useCallback((): void => {
+    setRegenerateDialogOpen(true);
   }, []);
 
-  const handleRevokeSuccess = useCallback((clientSecret: string): void => {
+  const handleRegenerateSuccess = useCallback((clientSecret: string): void => {
     setNewClientSecret(clientSecret);
     setSecretDialogOpen(true);
   }, []);
 
-  const handleRevokeError = useCallback((message: string): void => {
+  const handleRegenerateError = useCallback((message: string): void => {
     setErrorSnackbar({open: true, message});
   }, []);
 
@@ -125,16 +125,16 @@ export default function EditGeneralSettings({
           oauth2Config={oauth2Config}
           onFieldChange={onFieldChange}
         />
-        <DangerZoneSection onRevokeClick={handleRevokeClick} />
+        <DangerZoneSection onRegenerateClick={handleRegenerateClick} />
       </Stack>
 
-      {/* Revoke Application Confirmation Dialog */}
-      <ApplicationRevokeDialog
-        open={revokeDialogOpen}
+      {/* Regenerate Client Secret Confirmation Dialog */}
+      <RegenerateSecretDialog
+        open={regenerateDialogOpen}
         applicationId={application.id}
-        onClose={() => setRevokeDialogOpen(false)}
-        onSuccess={handleRevokeSuccess}
-        onError={handleRevokeError}
+        onClose={() => setRegenerateDialogOpen(false)}
+        onSuccess={handleRegenerateSuccess}
+        onError={handleRegenerateError}
       />
 
       {/* New Client Secret Success Dialog */}
