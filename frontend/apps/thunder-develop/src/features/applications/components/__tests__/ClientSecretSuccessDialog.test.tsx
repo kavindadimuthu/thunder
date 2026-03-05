@@ -47,6 +47,9 @@ vi.mock('react-i18next', () => ({
 describe('ClientSecretSuccessDialog', () => {
   const mockOnClose = vi.fn();
   const testClientSecret = 'test-client-secret-abc123xyz789';
+  // Stored at describe scope so assertions can reference it even after userEvent.setup()
+  // replaces navigator.clipboard with its own stub.
+  const mockWriteText = vi.fn().mockResolvedValue(undefined);
 
   const defaultProps = {
     open: true,
@@ -58,11 +61,15 @@ describe('ClientSecretSuccessDialog', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    // Mock clipboard API
-    Object.assign(navigator, {
-      clipboard: {
-        writeText: vi.fn().mockResolvedValue(undefined),
+    // Mock clipboard API using defineProperty since navigator.clipboard is a getter-only property.
+    // Re-apply each time because userEvent.setup() may replace navigator.clipboard with its own stub.
+    mockWriteText.mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', {
+      value: {
+        writeText: mockWriteText,
       },
+      writable: true,
+      configurable: true,
     });
   });
 
@@ -154,21 +161,25 @@ describe('ClientSecretSuccessDialog', () => {
     it('should copy client secret to clipboard when Copy Secret button is clicked', async () => {
       const user = userEvent.setup();
       renderDialog();
+      // Spy after userEvent.setup() so we intercept the clipboard stub it installs
+      const writeTextSpy = vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue(undefined);
 
       const copyButton = screen.getByRole('button', {name: 'Copy Secret'});
       await user.click(copyButton);
 
-      expect(navigator.clipboard.writeText).toHaveBeenCalledWith(testClientSecret);
+      expect(writeTextSpy).toHaveBeenCalledWith(testClientSecret);
     });
 
     it('should copy client secret when inline copy icon is clicked', async () => {
       const user = userEvent.setup();
       renderDialog();
+      // Spy after userEvent.setup() so we intercept the clipboard stub it installs
+      const writeTextSpy = vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue(undefined);
 
       const copyButton = screen.getByRole('button', {name: 'Copy to clipboard'});
       await user.click(copyButton);
 
-      expect(navigator.clipboard.writeText).toHaveBeenCalledWith(testClientSecret);
+      expect(writeTextSpy).toHaveBeenCalledWith(testClientSecret);
     });
 
     it('should show "Copied to clipboard" text after successful copy', async () => {
