@@ -107,9 +107,11 @@ function generateClientSecret(): string {
  *       { applicationId },
  *       {
  *         onSuccess: ({ application, clientSecret }) => {
+ *           // Only log the non-sensitive identifier, never log the secret itself
  *           console.log('Client secret regenerated for:', application.id);
- *           console.log('New client secret:', clientSecret);
- *           // Display the new client secret to the user
+ *           // Display the new client secret to the user via a secure UI flow
+ *           // e.g.: showSecretModal(application.id, clientSecret);
+ *           void clientSecret; // Secret must be handled by the UI, not logged
  *         },
  *         onError: (error) => {
  *           console.error('Failed to regenerate client secret:', error);
@@ -162,12 +164,15 @@ export default function useRegenerateClientSecret(): UseMutationResult<
 
       // Update the OAuth2 config with the new client secret
       const inboundAuthConfig = updateRequest.inbound_auth_config as InboundAuthConfig[] | undefined;
-      if (Array.isArray(inboundAuthConfig) && inboundAuthConfig.length > 0) {
-        const oauth2Config = inboundAuthConfig.find((config: InboundAuthConfig) => config.type === 'oauth2');
-        if (oauth2Config) {
-          oauth2Config.config.client_secret = newClientSecret;
-        }
+      const oauth2Config = Array.isArray(inboundAuthConfig)
+        ? inboundAuthConfig.find((config: InboundAuthConfig) => config.type === 'oauth2')
+        : undefined;
+
+      if (!oauth2Config) {
+        throw new Error('Application does not have an OAuth2 configuration. Cannot regenerate client secret.');
       }
+
+      oauth2Config.config.client_secret = newClientSecret;
 
       // Step 4: Update the application with the new client secret
       const updateResponse: {data: Application} = await http.request({

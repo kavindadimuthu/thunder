@@ -82,7 +82,10 @@ export default function RegenerateSecretDialog({
   };
 
   const handleConfirm = (): void => {
-    if (!applicationId) return;
+    if (!applicationId) {
+      setError(t('applications:regenerateSecret.dialog.error'));
+      return;
+    }
 
     setError(null);
     logger.info('Regenerating application client secret', {applicationId});
@@ -99,7 +102,11 @@ export default function RegenerateSecretDialog({
         },
         onError: (err) => {
           const errorMessage = err instanceof Error ? err.message : t('applications:regenerateSecret.dialog.error');
-          logger.error('Failed to regenerate client secret', {applicationId, error: err});
+          logger.error('Failed to regenerate client secret', {
+            applicationId,
+            errorMessage,
+            errorName: err instanceof Error ? err.name : 'UnknownError',
+          });
           setError(errorMessage);
           onError?.(errorMessage);
         },
@@ -125,7 +132,12 @@ export default function RegenerateSecretDialog({
         <Button onClick={handleCancel} disabled={regenerateClientSecret.isPending}>
           {t('common:actions.cancel')}
         </Button>
-        <Button onClick={handleConfirm} color="error" variant="contained" disabled={regenerateClientSecret.isPending}>
+        <Button
+          onClick={handleConfirm}
+          color="error"
+          variant="contained"
+          disabled={regenerateClientSecret.isPending || !applicationId}
+        >
           {regenerateClientSecret.isPending
             ? t('applications:regenerateSecret.dialog.regenerating')
             : t('applications:regenerateSecret.dialog.confirmButton')}

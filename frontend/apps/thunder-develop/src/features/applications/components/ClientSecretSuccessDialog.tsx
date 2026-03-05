@@ -16,7 +16,7 @@
  * under the License.
  */
 
-import {useState, type JSX} from 'react';
+import {useState, useRef, useEffect, type JSX} from 'react';
 import {
   Dialog,
   DialogContent,
@@ -68,12 +68,17 @@ export default function ClientSecretSuccessDialog({
   const {t} = useTranslation();
   const [copied, setCopied] = useState(false);
   const [showSecret, setShowSecret] = useState(false);
+  const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+  // Clear the copy timeout on unmount to prevent state updates after unmount
+  useEffect(() => () => clearTimeout(copyTimeoutRef.current), []);
 
   const handleCopy = async (): Promise<void> => {
     try {
       await navigator.clipboard.writeText(clientSecret);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      clearTimeout(copyTimeoutRef.current);
+      copyTimeoutRef.current = setTimeout(() => setCopied(false), 2000);
     } catch {
       // Failed to copy - user can manually select and copy
     }
@@ -84,6 +89,7 @@ export default function ClientSecretSuccessDialog({
   };
 
   const handleClose = (): void => {
+    clearTimeout(copyTimeoutRef.current);
     setCopied(false);
     setShowSecret(false);
     onClose();
