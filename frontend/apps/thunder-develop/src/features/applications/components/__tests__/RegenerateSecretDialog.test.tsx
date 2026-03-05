@@ -19,8 +19,10 @@
 import {render, screen, waitFor} from '@thunder/test-utils';
 import {describe, it, expect, vi, beforeEach, afterEach} from 'vitest';
 import userEvent from '@testing-library/user-event';
+import type {MutateOptions, MutationFunctionContext} from '@tanstack/react-query';
 import RegenerateSecretDialog from '../RegenerateSecretDialog';
 import type {RegenerateSecretDialogProps} from '../RegenerateSecretDialog';
+import type {RegenerateSecretVariables, RegenerateSecretResult} from '../../api/useRegenerateClientSecret';
 
 // Mock the logger
 vi.mock('@thunder/logger', async (importOriginal) => {
@@ -160,29 +162,32 @@ describe('RegenerateSecretDialog', () => {
       expect(mockMutate).toHaveBeenCalledWith(
         {applicationId: 'test-app-id'},
         expect.objectContaining({
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           onSuccess: expect.any(Function),
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           onError: expect.any(Function),
         }),
       );
     });
 
     it('should not initiate regeneration when applicationId is null', async () => {
-      const user = userEvent.setup();
       renderDialog({...defaultProps, applicationId: null});
 
       const regenerateButton = screen.getByRole('button', {name: 'Regenerate'});
-      await user.click(regenerateButton);
 
-      expect(mockMutate).not.toHaveBeenCalled();
+      expect(regenerateButton).toBeDisabled();
     });
   });
 
   describe('Success Flow', () => {
     it('should call onSuccess with new client secret after successful regeneration', async () => {
       // Mock mutate to immediately call onSuccess
-      mockMutate.mockImplementation((_vars, options) => {
-        options?.onSuccess?.({clientSecret: 'new-test-secret-123'});
-      });
+      mockMutate.mockImplementation(
+        (vars: RegenerateSecretVariables, options?: MutateOptions<RegenerateSecretResult, Error, RegenerateSecretVariables>) => {
+          const mockContext = {} as MutationFunctionContext;
+          options?.onSuccess?.({clientSecret: 'new-test-secret-123'} as RegenerateSecretResult, vars, undefined, mockContext);
+        },
+      );
 
       const user = userEvent.setup();
       renderDialog();
@@ -200,9 +205,12 @@ describe('RegenerateSecretDialog', () => {
   describe('Error Handling', () => {
     it('should display error message when regeneration fails', async () => {
       // Mock mutate to immediately call onError
-      mockMutate.mockImplementation((_vars, options) => {
-        options?.onError?.(new Error('Failed to regenerate client secret. Please try again.'));
-      });
+      mockMutate.mockImplementation(
+        (vars: RegenerateSecretVariables, options?: MutateOptions<RegenerateSecretResult, Error, RegenerateSecretVariables>) => {
+          const mockContext = {} as MutationFunctionContext;
+          options?.onError?.(new Error('Failed to regenerate client secret. Please try again.'), vars, undefined, mockContext);
+        },
+      );
 
       const user = userEvent.setup();
       renderDialog();
@@ -217,9 +225,12 @@ describe('RegenerateSecretDialog', () => {
 
     it('should call onError callback when regeneration fails', async () => {
       // Mock mutate to immediately call onError
-      mockMutate.mockImplementation((_vars, options) => {
-        options?.onError?.(new Error('Failed to regenerate client secret. Please try again.'));
-      });
+      mockMutate.mockImplementation(
+        (vars: RegenerateSecretVariables, options?: MutateOptions<RegenerateSecretResult, Error, RegenerateSecretVariables>) => {
+          const mockContext = {} as MutationFunctionContext;
+          options?.onError?.(new Error('Failed to regenerate client secret. Please try again.'), vars, undefined, mockContext);
+        },
+      );
 
       const user = userEvent.setup();
       renderDialog();

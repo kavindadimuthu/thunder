@@ -60,7 +60,7 @@ vi.mock('../AccessSection', () => ({
 vi.mock('../DangerZoneSection', () => ({
   default: ({onRegenerateClick}: {onRegenerateClick: () => void}) => (
     <div data-testid="danger-zone-section">
-      <button onClick={onRegenerateClick} data-testid="regenerate-button">
+      <button type="button" onClick={onRegenerateClick} data-testid="regenerate-button">
         Regenerate Client Secret
       </button>
     </div>
@@ -81,10 +81,10 @@ vi.mock('../../../RegenerateSecretDialog', () => ({
   }) =>
     open ? (
       <div data-testid="regenerate-dialog" data-application-id={applicationId}>
-        <button onClick={onClose} data-testid="dialog-close">
+        <button type="button" onClick={onClose} data-testid="dialog-close">
           Close
         </button>
-        <button onClick={() => onSuccess?.('new-test-secret')} data-testid="dialog-success">
+        <button type="button" onClick={() => onSuccess?.('new-test-secret')} data-testid="dialog-success">
           Trigger Success
         </button>
       </div>
@@ -95,7 +95,7 @@ vi.mock('../../../ClientSecretSuccessDialog', () => ({
   default: ({open, clientSecret, onClose}: {open: boolean; clientSecret: string; onClose: () => void}) =>
     open ? (
       <div data-testid="secret-dialog" data-client-secret={clientSecret}>
-        <button onClick={onClose} data-testid="secret-dialog-close">
+        <button type="button" onClick={onClose} data-testid="secret-dialog-close">
           Close Secret Dialog
         </button>
       </div>

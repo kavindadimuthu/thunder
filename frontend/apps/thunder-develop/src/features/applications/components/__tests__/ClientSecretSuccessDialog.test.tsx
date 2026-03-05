@@ -254,7 +254,7 @@ describe('ClientSecretSuccessDialog', () => {
 
       // Rerender with open: false then open: true
       rerender(<ClientSecretSuccessDialog {...defaultProps} open={false} />);
-      rerender(<ClientSecretSuccessDialog {...defaultProps} open={true} />);
+      rerender(<ClientSecretSuccessDialog {...defaultProps} open />);
 
       // Should be masked again
       expect(document.querySelector('input[type="password"]')).toBeInTheDocument();
