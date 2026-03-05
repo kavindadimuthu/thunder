@@ -18,7 +18,7 @@
 
 import {useState, useCallback} from 'react';
 import type {JSX} from 'react';
-import {Stack, Snackbar, Alert} from '@wso2/oxygen-ui';
+import {Stack} from '@wso2/oxygen-ui';
 import type {Application} from '../../../models/application';
 import type {OAuth2Config} from '../../../models/oauth';
 import QuickCopySection from './QuickCopySection';
@@ -83,10 +83,6 @@ export default function EditGeneralSettings({
   const [regenerateDialogOpen, setRegenerateDialogOpen] = useState(false);
   const [secretDialogOpen, setSecretDialogOpen] = useState(false);
   const [newClientSecret, setNewClientSecret] = useState<string>('');
-  const [errorSnackbar, setErrorSnackbar] = useState<{open: boolean; message: string}>({
-    open: false,
-    message: '',
-  });
 
   const handleRegenerateClick = useCallback((): void => {
     setRegenerateDialogOpen(true);
@@ -97,17 +93,9 @@ export default function EditGeneralSettings({
     setSecretDialogOpen(true);
   }, []);
 
-  const handleRegenerateError = useCallback((message: string): void => {
-    setErrorSnackbar({open: true, message});
-  }, []);
-
   const handleSecretDialogClose = useCallback((): void => {
     setSecretDialogOpen(false);
     setNewClientSecret('');
-  }, []);
-
-  const handleSnackbarClose = useCallback((): void => {
-    setErrorSnackbar((prev) => ({...prev, open: false}));
   }, []);
 
   return (
@@ -134,7 +122,6 @@ export default function EditGeneralSettings({
         applicationId={application.id}
         onClose={() => setRegenerateDialogOpen(false)}
         onSuccess={handleRegenerateSuccess}
-        onError={handleRegenerateError}
       />
 
       {/* New Client Secret Success Dialog */}
@@ -143,18 +130,6 @@ export default function EditGeneralSettings({
         clientSecret={newClientSecret}
         onClose={handleSecretDialogClose}
       />
-
-      {/* Error Snackbar */}
-      <Snackbar
-        open={errorSnackbar.open}
-        autoHideDuration={6000}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{vertical: 'bottom', horizontal: 'right'}}
-      >
-        <Alert severity="error" onClose={handleSnackbarClose}>
-          {errorSnackbar.message}
-        </Alert>
-      </Snackbar>
     </>
   );
 }

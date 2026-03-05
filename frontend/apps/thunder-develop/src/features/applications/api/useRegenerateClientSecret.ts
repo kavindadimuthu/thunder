@@ -20,7 +20,6 @@ import {useMutation, useQueryClient, type UseMutationResult} from '@tanstack/rea
 import {useConfig} from '@thunder/shared-contexts';
 import {useAsgardeo} from '@asgardeo/react';
 import type {Application} from '../models/application';
-import type {CreateApplicationRequest} from '../models/requests';
 import type {InboundAuthConfig} from '../models/inbound-auth';
 import ApplicationQueryKeys from '../constants/application-query-keys';
 
@@ -77,20 +76,6 @@ function generateClientSecret(): string {
     .replace(/\+/g, '-')
     .replace(/\//g, '_')
     .replace(/=/g, '');
-}
-
-/**
- * Converts an Application object to a CreateApplicationRequest by removing
- * server-generated fields.
- *
- * @param application - The full application object
- * @returns The application data suitable for update requests
- */
-function toUpdateRequest(application: Application): CreateApplicationRequest {
-  // Destructure to remove server-generated fields
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const {id, created_at, updated_at, ...rest} = application;
-  return rest as CreateApplicationRequest;
 }
 
 /**
@@ -171,7 +156,9 @@ export default function useRegenerateClientSecret(): UseMutationResult<
       const newClientSecret = generateClientSecret();
 
       // Step 3: Prepare the update request with the new client secret
-      const updateRequest = toUpdateRequest(currentApplication);
+      // Destructure to remove server-generated fields
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const {id, created_at, updated_at, ...updateRequest} = currentApplication;
 
       // Update the OAuth2 config with the new client secret
       const inboundAuthConfig = updateRequest.inbound_auth_config as InboundAuthConfig[] | undefined;
