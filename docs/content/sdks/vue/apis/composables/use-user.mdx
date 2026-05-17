@@ -1,0 +1,51 @@
+---
+title: useUser()
+description: Access user profile data
+---
+
+# `useUser()`
+
+The `useUser` composable provides access to the current user's profile, schemas, and profile update operations. It is intended for components that need richer profile data than the basic user object exposed by [`useThunderID()`](/docs/next/sdks/vue/apis/composables/use-thunderid).
+
+## Usage
+
+Import and use the composable inside `<script setup>` (or `setup()`) to access the user profile:
+
+```vue title="src/ProfileView.vue" showLineNumbers
+<script setup>
+import { useUser } from '@thunderid/vue'
+
+const { profile, flattenedProfile, schemas, revalidateProfile } = useUser()
+</script>
+
+<template>
+  <div v-if="flattenedProfile">
+    <h2>{{ flattenedProfile.name }}</h2>
+    <p>Email: {{ flattenedProfile.email }}</p>
+    <button @click="revalidateProfile()">Refresh</button>
+  </div>
+  <div v-else>Loading profile...</div>
+</template>
+```
+
+:::note
+This composable must be used inside a component rendered within `<ThunderIDProvider />`. Otherwise, it will throw an error.
+:::
+
+## Return Values
+
+| Property | Type | Description |
+| :--- | :--- | :--- |
+| `profile` | `Ref<UserProfile \| null>` | The full user profile object including the raw `profile` and `schemas` |
+| `flattenedProfile` | `Ref<User \| null>` | A flat, easy-to-render representation of the profile |
+| `schemas` | `Ref<Schema[]>` | SCIM schemas describing the available profile fields |
+| `onUpdateProfile` | `(updatedUser: User) => void` | Updates the in-memory user profile after a successful save |
+| `revalidateProfile` | `() => Promise<void>` | Refetches the profile from the server |
+
+## Error Handling
+
+If `useUser` is called outside of a `<ThunderIDProvider />`, it throws:
+
+```text
+[ThunderID] useUser() was called outside of <ThunderIDProvider>. Make sure to install the ThunderIDPlugin or wrap your app with <ThunderIDProvider>.
+```
