@@ -45,11 +45,11 @@ The composable returns the full ThunderID context:
 
 | Property | Type | Description |
 | :--- | :--- | :--- |
-| `isSignedIn` | `Ref<boolean>` | Whether the user is currently signed in |
-| `isLoading` | `Ref<boolean>` | Whether an authentication operation is in progress |
-| `isInitialized` | `Ref<boolean>` | Whether the SDK has finished initializing |
-| `user` | `ShallowRef<User \| null>` | The authenticated user object, or `null` if not signed in |
-| `organization` | `ShallowRef<Organization \| null>` | The current active organization |
+| `isSignedIn` | `boolean` | Whether the user is currently signed in |
+| `isLoading` | `boolean` | Whether an authentication operation is in progress |
+| `isInitialized` | `boolean` | Whether the SDK has finished initializing |
+| `user` | `User \| null` | The authenticated user object, or `null` if not signed in |
+| `organization` | `Organization \| null` | The current active organization |
 | `baseUrl` | `string` | The configured base URL of the <ProductName /> instance |
 | `clientId` | `string` | The configured client ID |
 | `signIn` | `(...args) => Promise<User \| EmbeddedSignInFlowResponse>` | Initiates the sign-in flow |
