@@ -31,18 +31,6 @@ const sidebar: SidebarsConfig = {
       items: [
         {
           type: 'category',
-          label: 'Plugin',
-          collapsed: true,
-          items: [
-            {
-              type: 'doc',
-              id: 'sdks/vue/apis/plugin/thunderid-plugin',
-              label: 'ThunderIDPlugin',
-            },
-          ],
-        },
-        {
-          type: 'category',
           label: 'Providers',
           collapsed: true,
           items: [
@@ -167,16 +155,6 @@ const sidebar: SidebarsConfig = {
               type: 'doc',
               id: 'sdks/vue/apis/composables/use-thunderid',
               label: 'useThunderID()',
-            },
-            {
-              type: 'doc',
-              id: 'sdks/vue/apis/composables/use-user',
-              label: 'useUser()',
-            },
-            {
-              type: 'doc',
-              id: 'sdks/vue/apis/composables/use-organization',
-              label: 'useOrganization()',
             },
           ],
         },
